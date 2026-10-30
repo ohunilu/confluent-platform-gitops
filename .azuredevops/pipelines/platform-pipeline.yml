@@ -10,35 +10,51 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: confluent-platform-secrets 
+  - group: confluent-platform-secrets
+
   - name: TF_VERSION
     value: '1.7.0'
+
   - name: TF_WORKING_DIR
     value: 'platform/environments/dev'
 
 stages:
   - stage: Plan
     displayName: 'Terraform Plan'
+
     jobs:
       - job: Plan
+
         steps:
+          - checkout: self
+
           - task: TerraformInstaller@1
             inputs:
               terraformVersion: $(TF_VERSION)
-          
-          - script: |
-              cd $(TF_WORKING_DIR)
-              terraform init -backend-config="storage_account_name=$(TF_STATE_STORAGE_ACCOUNT)" -backend-config="container_name=tfstate" -backend-config="key=platform.tfstate"
-              terraform plan -out=tfplan
+
+          - task: AzureCLI@2
             displayName: 'Terraform Init & Plan'
+            inputs:
+              azureSubscription: 'sc-terraform-state-backend-mi'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -e
+
+                echo "Current Azure Account:"
+                az account show
+
+                cd $(TF_WORKING_DIR)
+
+                terraform init -reconfigure  
+
+                terraform plan -out=tfplan
             env:
-              # The Confluent provider automatically uses these environment variables
               CONFLUENT_CLOUD_API_KEY: $(CONFLUENT_CLOUD_API_KEY)
               CONFLUENT_CLOUD_API_SECRET: $(CONFLUENT_CLOUD_API_SECRET)
               TF_VAR_azure_subscription_id: $(AZURE_SUBSCRIPTION_ID)
               TF_VAR_confluent_organization_id: $(CONFLUENT_ORGANIZATION_ID)
-          
-          # The plan is published so it can be applied in the next stage
+
           - publish: $(TF_WORKING_DIR)/tfplan
             artifact: tfplan
 
@@ -46,26 +62,45 @@ stages:
     displayName: 'Terraform Apply'
     dependsOn: Plan
     condition: succeeded()
+
     jobs:
       - deployment: Apply
         environment: 'confluent-platform-dev'
+
         strategy:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+
                 - task: TerraformInstaller@1
                   inputs:
                     terraformVersion: $(TF_VERSION)
-                
+
                 - download: current
                   artifact: tfplan
-                
-                - script: |
-                    cd $(TF_WORKING_DIR)
-                    terraform init -backend-config="storage_account_name=$(TF_STATE_STORAGE_ACCOUNT)" -backend-config="container_name=tfstate" -backend-config="key=platform.tfstate"
-                   
-                    terraform apply -auto-approve $(Pipeline.Workspace)/tfplan/tfplan
+
+                - task: AzureCLI@2
                   displayName: 'Terraform Apply'
+                  inputs:
+                    azureSubscription: 'sc-terraform-state-backend-mi'
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -e
+
+                      echo "Current Azure Account:"
+                      az account show
+
+                      cd $(TF_WORKING_DIR)
+
+                      terraform init -reconfigure \
+                        -backend-config="storage_account_name=$(TF_STATE_STORAGE_ACCOUNT)" \
+                        -backend-config="container_name=tfstate" \
+                        -backend-config="key=platform.tfstate"
+
+                      terraform apply -auto-approve \
+                        $(Pipeline.Workspace)/tfplan/tfplan
                   env:
                     CONFLUENT_CLOUD_API_KEY: $(CONFLUENT_CLOUD_API_KEY)
                     CONFLUENT_CLOUD_API_SECRET: $(CONFLUENT_CLOUD_API_SECRET)
