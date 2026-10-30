@@ -13,7 +13,7 @@ variables:
   - group: confluent-platform-secrets
 
   - name: TF_VERSION
-    value: '1.7.0'
+    value: '1.17.1'
 
   - name: TF_WORKING_DIR
     value: 'platform/environments/dev'
@@ -41,6 +41,13 @@ stages:
               addSpnToEnvironment: true
               inlineScript: |
                 set -e
+
+                # Export OIDC variables for Terraform
+                export ARM_USE_OIDC=true
+                export ARM_OIDC_TOKEN="$idToken"
+                export ARM_CLIENT_ID="$servicePrincipalId"
+                export ARM_TENANT_ID="$tenantId"
+                export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 
                 echo "Current Azure Account:"
                 az account show
@@ -90,6 +97,13 @@ stages:
                     addSpnToEnvironment: true
                     inlineScript: |
                       set -e
+
+                      # Export OIDC variables for Terraform
+                      export ARM_USE_OIDC=true
+                      export ARM_OIDC_TOKEN="$idToken"
+                      export ARM_CLIENT_ID="$servicePrincipalId"
+                      export ARM_TENANT_ID="$tenantId"
+                      export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 
                       echo "Current Azure Account:"
                       az account show
