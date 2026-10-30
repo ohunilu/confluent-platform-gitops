@@ -1,0 +1,33 @@
+# ---------- Terraform ----------
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+crash.*.log
+tf.log
+
+# Provider lock file MUST be committed — do not ignore it
+!.terraform.lock.hcl
+
+# Variable files (may contain secrets; use Azure DevOps Variable Groups instead)
+*.tfvars
+*.tfvars.json
+
+# Local override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI config
+.terraformrc
+terraform.rc
+
+# ---------- IDE / OS ----------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
