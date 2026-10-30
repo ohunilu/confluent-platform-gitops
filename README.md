@@ -1,20 +1,37 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# confluent-platform-gitops
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+Terraform-driven deployment of Confluent Cloud on Azure DevOps, with Dynatrace observability.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+## Repository Structure
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+- `platform/` — Core Confluent Cloud platform (environments, clusters, networking, RBAC, audit, Schema Registry, ksqlDB)
+- `application/` — Application-level resources (topics, schemas, ACLs) per team
+- `observability/` — Dynatrace monitoring and dashboard configuration
+- `.azuredevops/pipelines/` — Azure DevOps pipeline definitions
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+## Current Status
+
+### Stage 1 — Foundation
+
+- Git repository with enterprise folder structure
+- Branch policies on `main` (reviewers, build validation)
+- Confluent Cloud service account `sa-terraform-platform` with OrganizationAdmin
+- API key/secret stored in Azure DevOps Variable Group `confluent-platform-secrets`
+- Azure Blob Storage backend for Terraform state (container: `tfstate`)
+- User-assigned Managed Identity `id-terraform-state-backend` granted **Storage Blob Data Contributor**
+- Azure DevOps service connection using workload identity federation (secret-less)
+- Terraform provider configuration with `use_azuread_auth = true`
+
+### ⏳ Stage 2 — Platform pipeline (pending)
+
+### ⏳ Stage 3 — Application pipeline (pending)
+
+### ⏳ Stage 4 — Dynatrace integration (pending)
+
+## Local Development
+
+```bash
+cd platform/environments/dev
+az login
+terraform init
+terraform plan
