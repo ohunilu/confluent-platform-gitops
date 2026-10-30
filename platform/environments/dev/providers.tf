@@ -11,7 +11,7 @@ terraform {
     storage_account_name = "tfstateconfluent"
     container_name       = "tfstate"
     key                  = "platform.tfstate"
-    use_azuread_auth     = true 
+    use_oidc             = true
     # Authentication to the storage account is handled by the
     # Azure DevOps service connection / pipeline identity.
   }

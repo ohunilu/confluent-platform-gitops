@@ -38,6 +38,7 @@ stages:
               azureSubscription: 'sc-terraform-state-backend-mi'
               scriptType: bash
               scriptLocation: inlineScript
+              addSpnToEnvironment: true
               inlineScript: |
                 set -e
 
@@ -86,6 +87,7 @@ stages:
                     azureSubscription: 'sc-terraform-state-backend-mi'
                     scriptType: bash
                     scriptLocation: inlineScript
+                    addSpnToEnvironment: true
                     inlineScript: |
                       set -e
 
