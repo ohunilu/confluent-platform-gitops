@@ -10,7 +10,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: confluent-application-secrets   # ← separate variable group
+  - group: confluent-application-secrets   
   - name: TF_VERSION
     value: '1.17.1'
   - name: TF_WORKING_DIR
@@ -61,7 +61,7 @@ stages:
     condition: succeeded()
     jobs:
       - deployment: Apply
-        environment: 'confluent-application-dev'   # ← separate environment for approvals
+        environment: 'confluent-application-dev'   
         strategy:
           runOnce:
             deploy:
