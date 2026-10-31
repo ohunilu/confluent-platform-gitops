@@ -58,7 +58,7 @@ data "confluent_schema_registry_cluster" "main" {
   }
 
   depends_on = [
-    confluent_environment.platform
+    confluent_kafka_cluster.platform
   ]
 }
 
