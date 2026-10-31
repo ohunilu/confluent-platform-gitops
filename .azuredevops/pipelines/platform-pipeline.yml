@@ -56,7 +56,9 @@ stages:
 
                 terraform init -reconfigure  
 
-                terraform plan -destroy -out=destroy.tfplan
+                terraform state list
+                
+                terraform plan -out=tfplan
             env:
               CONFLUENT_CLOUD_API_KEY: $(CONFLUENT_CLOUD_API_KEY)
               CONFLUENT_CLOUD_API_SECRET: $(CONFLUENT_CLOUD_API_SECRET)
