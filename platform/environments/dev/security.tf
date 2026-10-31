@@ -23,8 +23,8 @@ resource "confluent_role_binding" "platform_org_admin" {
 }
 
 # Grant the ksqlDB service account permission to its own cluster
-resource "confluent_role_binding" "ksqldb_admin" {
-  principal   = "User:${confluent_service_account.ksqldb.id}"
-  role_name   = "KsqlAdmin"
-  crn_pattern = confluent_ksql_cluster.main.resource_name
-}
+#resource "confluent_role_binding" "ksqldb_admin" {
+#  principal   = "User:${confluent_service_account.ksqldb.id}"
+#  role_name   = "KsqlAdmin"
+#  crn_pattern = confluent_ksql_cluster.main.resource_name
+#}
