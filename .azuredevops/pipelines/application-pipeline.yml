@@ -92,6 +92,9 @@ stages:
                       export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 
                       cd $(TF_WORKING_DIR)
+                      echo "Cloud API key ID reaching Terraform: ${CONFLUENT_CLOUD_API_KEY}"
+                      displayName: 'Diagnose Cloud API key'
+                      
                       terraform init -reconfigure
                       terraform apply -auto-approve $(Pipeline.Workspace)/app-tfplan/tfplan
                   env:
