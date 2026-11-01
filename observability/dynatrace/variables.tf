@@ -13,7 +13,7 @@ variable "dynatrace_paas_token" {
 variable "azure_location" {
   description = "Azure region for the ActiveGate VM"
   type        = string
-  default     = "germanywestcentral"
+  default     = "belgiumcentral"
 }
 
 variable "resource_group_name" {
