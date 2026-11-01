@@ -36,14 +36,18 @@ Terraform-driven deployment of Confluent Cloud on Azure DevOps, with Dynatrace o
 - All inputs injected via `TF_VAR_*` from `confluent-platform-secrets` variable group: `azure_subscription_id`, `confluent_organization_id`, `TF_STATE_STORAGE_ACCOUNT`
 - Note: `KsqlAdmin` role binding intentionally omitted — **Basic tier Kafka clusters do not support resource-level RBAC**; ksqlDB access on Basic uses ACLs/API keys instead
 
-### ⏳ Stage 3 — Application pipeline (pending)
+### Stage 3 — Application pipeline
+
+- Azure DevOps pipeline `.azuredevops/pipelines/application-pipeline.yml` with separate Plan and Apply stages, triggered on `application/*` changes only
+- Separate Terraform state (`orders-app.tfstate`) in the same `tfstate` container; separate variable group `confluent-application-secrets`; separate environment `confluent-application-dev` with approval gate
+- Application Terraform layer reads platform resource IDs via `data.terraform_remote_state.platform` (no hardcoded cluster/environment IDs; no reading of platform state directly)
+- Reusable modules under `application/modules/`: `kafka-topic`, `schema`, `acl-binding` — each with its own `required_providers`, `variables.tf`, and `outputs.tf`
+- Service accounts `sa-orders-producer` and `sa-orders-consumer` created with dedicated Kafka API keys scoped to the platform cluster
+- `orders` topic (6 partitions) and Avro schema `orders-value` (`com.example.orders.Order`) registered against the platform Schema Registry
+- 5 ACLs enforce least-privilege access via the Kafka ACL API (Basic tier does not support resource-level RBAC): producer WRITE + DESCRIBE on topic; consumer READ + DESCRIBE on topic; consumer READ on group `orders-consumer-group`
+- Pipeline authenticates to Confluent Cloud using a **Cloud API key** (control-plane, owned by `sa-application-admin` with `OrganizationAdmin`); Cluster-scoped keys are used only for data-plane operations (topics, ACLs, schemas)
+- Kafka and Schema Registry REST endpoints resolved via `terraform_remote_state.platform` outputs, not hardcoded
+
+**Scope note:** Stage 3 provisions the infrastructure for data flow. No producer or consumer is deployed; the `orders` topic will appear empty in Confluent Cloud Console until an application team connects with `sa-orders-producer` credentials and starts writing. Demonstrating data flow (a sample producer/consumer) is out of scope for this stage.
 
 ### ⏳ Stage 4 — Dynatrace integration (pending)
-
-## Local Development
-
-```bash
-cd platform/environments/dev
-az login
-terraform init
-terraform plan
