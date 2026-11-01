@@ -2,7 +2,7 @@ resource "azurerm_linux_virtual_machine" "activegate" {
   name                = "vm-dynatrace-activegate"
   resource_group_name = azurerm_resource_group.observability.name
   location            = azurerm_resource_group.observability.location
-  size                = "Standard_B2s"
+  size                = "Standard_B1s"
   admin_username      = "azureuser"
 
   network_interface_ids = [azurerm_network_interface.activegate.id]
