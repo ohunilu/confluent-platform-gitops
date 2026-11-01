@@ -38,6 +38,11 @@ resource "confluent_api_key" "orders_producer_kafka" {
     id          = data.terraform_remote_state.platform.outputs.kafka_cluster_id
     api_version = "cmk/v2"
     kind        = "Cluster"
+    environment {    
+
+      id = data.terraform_remote_state.platform.outputs.environment_id
+
+    }
   }
 }
 
@@ -55,6 +60,11 @@ resource "confluent_api_key" "orders_consumer_kafka" {
     id          = data.terraform_remote_state.platform.outputs.kafka_cluster_id
     api_version = "cmk/v2"
     kind        = "Cluster"
+    environment {                                           
+
+      id = data.terraform_remote_state.platform.outputs.environment_id
+      
+    }
   }
 }
 

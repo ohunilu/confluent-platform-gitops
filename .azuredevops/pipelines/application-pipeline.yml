@@ -91,9 +91,6 @@ stages:
                       export ARM_TENANT_ID="$tenantId"
                       export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 
-                      echo "Provider Cloud key ID: ${TF_VAR_confluent_cloud_api_key:0:4}...${TF_VAR_confluent_cloud_api_key: -4}"
-                      echo "Kafka admin key ID:    ${TF_VAR_kafka_admin_api_key:0:4}...${TF_VAR_kafka_admin_api_key: -4}"
-
                       cd $(TF_WORKING_DIR)
 
                       terraform init -reconfigure
