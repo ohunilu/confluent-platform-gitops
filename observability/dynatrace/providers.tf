@@ -8,6 +8,9 @@ terraform {
       source  = "dynatrace-oss/dynatrace"
       version = "~> 1.0"
     }
+    tls = { 
+      source = "hashicorp/tls" 
+      version = "~> 4.0" }
   }
 }
 
