@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
-    dynatrace = {
-      source  = "dynatrace-oss/dynatrace"
-      version = "~> 1.0"
-    }
     tls = { 
       source = "hashicorp/tls" 
       version = "~> 4.0" }
@@ -16,9 +12,4 @@ terraform {
 
 provider "azurerm" {
   features {}
-}
-
-provider "dynatrace" {
-  dt_env_url   = var.dynatrace_env_url
-  dt_api_token = var.dynatrace_api_token
 }

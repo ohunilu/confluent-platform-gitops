@@ -48,7 +48,6 @@ stages:
             env:
               TF_VAR_dynatrace_env_url: $(DYNATRACE_ENV_URL)
               TF_VAR_dynatrace_paas_token: $(DYNATRACE_PAAS_TOKEN)
-              TF_VAR_dynatrace_api_token: $(DYNATRACE_API_TOKEN)
 
           - publish: $(TF_WORKING_DIR)/tfplan
             artifact: observability-tfplan
@@ -92,4 +91,3 @@ stages:
                   env:
                     TF_VAR_dynatrace_env_url: $(DYNATRACE_ENV_URL)
                     TF_VAR_dynatrace_paas_token: $(DYNATRACE_PAAS_TOKEN)
-                    TF_VAR_dynatrace_api_token: $(DYNATRACE_API_TOKEN)
