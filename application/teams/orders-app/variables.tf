@@ -1,3 +1,15 @@
+variable "confluent_cloud_api_key" {
+  description = "Confluent Cloud API key (Cloud/Global scope, for control-plane operations)"
+  type        = string
+  sensitive   = true
+}
+
+variable "confluent_cloud_api_secret" {
+  description = "Confluent Cloud API secret (Cloud/Global scope)"
+  type        = string
+  sensitive   = true
+}
+
 variable "kafka_admin_api_key" {
   description = "Kafka API key for the topic/ACL admin (bootstrap key)"
   type        = string

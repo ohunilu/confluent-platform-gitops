@@ -47,6 +47,8 @@ stages:
                 terraform init -reconfigure
                 terraform plan -out=tfplan
             env:
+              TF_VAR_confluent_cloud_api_key: $(CONFLUENT_CLOUD_API_KEY)
+              TF_VAR_confluent_cloud_api_secret: $(CONFLUENT_CLOUD_API_SECRET)
               TF_VAR_kafka_admin_api_key: $(KAFKA_ADMIN_API_KEY)
               TF_VAR_kafka_admin_api_secret: $(KAFKA_ADMIN_API_SECRET)
               TF_VAR_schema_registry_api_key: $(SCHEMA_REGISTRY_API_KEY)
@@ -93,6 +95,8 @@ stages:
                       terraform init -reconfigure
                       terraform apply -auto-approve $(Pipeline.Workspace)/app-tfplan/tfplan
                   env:
+                    TF_VAR_confluent_cloud_api_key: $(CONFLUENT_CLOUD_API_KEY)
+                    TF_VAR_confluent_cloud_api_secret: $(CONFLUENT_CLOUD_API_SECRET)
                     TF_VAR_kafka_admin_api_key: $(KAFKA_ADMIN_API_KEY)
                     TF_VAR_kafka_admin_api_secret: $(KAFKA_ADMIN_API_SECRET)
                     TF_VAR_schema_registry_api_key: $(SCHEMA_REGISTRY_API_KEY)
