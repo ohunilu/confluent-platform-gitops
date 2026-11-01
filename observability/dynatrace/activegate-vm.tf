@@ -9,7 +9,7 @@ resource "azurerm_linux_virtual_machine" "activegate" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("~/.ssh/id_rsa.pub") # Or generate a key and store it
+    public_key = tls_private_key.activegate.public_key_openssh
   }
 
   os_disk {
@@ -38,4 +38,9 @@ resource "azurerm_virtual_machine_extension" "activegate" {
       DYNATRACE_PAAS_TOKEN = var.dynatrace_paas_token
     }))
   })
+}
+
+resource "tls_private_key" "activegate" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }

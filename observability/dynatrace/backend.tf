@@ -9,14 +9,4 @@ terraform {
     use_cli              = false
   }
 
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
-    }
-    dynatrace = {
-      source  = "dynatrace-oss/dynatrace"
-      version = "~> 1.0"
-    }
-  }
 }
