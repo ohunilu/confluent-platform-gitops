@@ -9,11 +9,6 @@ variable "dynatrace_paas_token" {
   sensitive   = true
 }
 
-variable "dynatrace_api_token" {
-  description = "Dynatrace API token for Terraform to manage ActiveGate tokens"
-  type        = string
-  sensitive   = true
-}
 
 variable "azure_location" {
   description = "Azure region for the ActiveGate VM"
