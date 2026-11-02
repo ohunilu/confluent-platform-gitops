@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "VisualStudioOnline-B1A189B4E1B945FF899611833D421FEF"
+    resource_group_name  = "<Azure Resource Group Name>"
     storage_account_name = "tfstateconfluent"
     container_name       = "tfstate"
     key                  = "orders-app.tfstate"
