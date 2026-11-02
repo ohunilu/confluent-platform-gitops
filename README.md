@@ -16,17 +16,17 @@ Terraform-driven deployment of Confluent Cloud on Azure DevOps, with Dynatrace o
 - Git repository with enterprise folder structure
 - Branch policies on `main` (reviewers, build validation)
 - Confluent Cloud service account `sa-terraform-platform` with OrganizationAdmin
-- API key/secret stored in Azure DevOps Variable Group `confluent-platform-secrets`
-- Azure Blob Storage backend for Terraform state (container: `tfstate`)
+- API key/secret stored in Azure DevOps Variable Group
+- Azure Blob Storage backend for Terraform states (container: `tfstate`)
 - User-assigned Managed Identity `id-terraform-state-backend` granted **Storage Blob Data Contributor**
 - Azure DevOps service connection using workload identity federation (secret-less)
 - Terraform provider configuration with `use_azuread_auth = true`
 
 ### Stage 2 — Platform pipeline
 
-- Azure DevOps pipeline `.azuredevops/pipelines/platform-pipeline.yml` with two stages: **Plan** (auto on merge) and **Apply** (manual approval gate on `confluent-platform-dev` environment)
+- Azure DevOps pipeline `.azuredevops/pipelines/platform-pipeline.yml`  with separate Plan and Apply stages, triggered on `platform/*` changes only
 - Terraform provisions the Confluent Cloud **environment** `platform-dev` with `stream_governance { package = "ESSENTIALS" }`
-- Kafka cluster `platform-kafka-cluster` (Basic tier, SINGLE_ZONE, Azure `germanywestcentral`)
+- Kafka cluster `platform-kafka-cluster` (Basic tier, SINGLE_ZONE)
 - Azure **Private Link** network (`PRIVATELINK`) and `confluent_private_link_access` scoped to the Azure subscription
 - **Schema Registry** auto-provisioned via `stream_governance`; queried via `data.confluent_schema_registry_cluster` with `depends_on = [confluent_kafka_cluster.platform]`
 - **ksqlDB** cluster `ksqldb-platform` (4 CSU) with dedicated credential identity
@@ -52,18 +52,18 @@ Terraform-driven deployment of Confluent Cloud on Azure DevOps, with Dynatrace o
 
 ### Stage 4 — Dynatrace integration
 
+- Azure DevOps pipeline `.azuredevops/pipelines/observability-pipeline.yml` provisions a Linux VM to host a host-based **ActiveGate**
 - Dynatrace 15-day free trial tenant provisioned; Confluent Cloud (Kafka) extension installed from Dynatrace Hub
 - Confluent service account `sa-dynatrace-metrics` created with `MetricsViewer` role at organization scope
 - Cloud API key (`--resource cloud`) created for the Dynatrace service account; Cluster-scoped keys are not valid for the Metrics API
-- A dedicated Azure DevOps pipeline (`.azuredevops/pipelines/observability-pipeline.yml`) provisions a Linux VM to host a host-based **ActiveGate**
 - The VM is bootstrapped via a `CustomScript` extension that runs `install-activegate.sh` to download and install the ActiveGate using a PaaS token
 - ActiveGate is registered in Dynatrace and selected as the execution target for the Confluent Cloud extension
-- Monitoring configuration uses **Basic Authentication** (Cloud API key/secret) and the Confluent Metrics API `/export` endpoint with resource IDs for the Kafka cluster (`lkc-w7kwzp5`), Schema Registry (`lsrc-k8wogzg`), and ksqlDB (`lksqlc-dozpg31`)
+- Monitoring configuration uses **Basic Authentication** (Cloud API key/secret) and the Confluent Metrics API `/export` endpoint with resource IDs for the Kafka cluster, Schema Registry, and ksqlDB
 - Extension polls the Confluent Metrics API every 1 minute; **no agent** is installed inside Confluent Cloud or the application environment
 - Enabled feature sets: **Server Metrics**, **Server Consumer Lag Metrics**, **Schema Registry Metrics**, **KSQL Metrics**, and **Connector Metrics**
 - **Prebuilt dashboard** is available in the Dynatrace Dashboards app with tiles for broker throughput, cluster usage, and aggregate consumer lag
 
-**Consumer lag caveat:** The Dynatrace extension does not provide per-partition or per-consumer-group lag from the Confluent API. Detailed lag requires the Kafka Lag Exporter, which is out of scope for Stage 4. Aggregate lag from the Confluent API is available; per-group lag can be added in a future Stage 4.5.
+**Consumer lag caveat:** The Dynatrace extension does not provide per-partition or per-consumer-group lag from the Confluent API. Detailed lag requires the Kafka Lag Exporter, which is out of scope for this project. Aggregate lag from the Confluent API is available.
 
 **Data flow note:** Broker throughput and consumer lag will read 0 until a producer and consumer connect to the `orders` topic. This is expected; the dashboard confirms the integration is working when baseline cluster metrics (connections, request counts, partition counts) are visible.
 
