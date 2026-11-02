@@ -2,6 +2,10 @@
 
 Terraform-driven deployment of Confluent Cloud on Azure DevOps, with Dynatrace observability.
 
+## Architecture Diagram
+
+![Confluent Platform GitOps Architecture](assets/architecture.jpg)
+
 ## Repository Structure
 
 - `platform/` — Core Confluent Cloud platform (environments, clusters, networking, RBAC, audit, Schema Registry, ksqlDB)
@@ -9,7 +13,7 @@ Terraform-driven deployment of Confluent Cloud on Azure DevOps, with Dynatrace o
 - `observability/` — Dynatrace monitoring and dashboard configuration
 - `.azuredevops/pipelines/` — Azure DevOps pipeline definitions
 
-## Current Status
+## Project Stages
 
 ### Stage 1 — Foundation
 
