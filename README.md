@@ -50,4 +50,21 @@ Terraform-driven deployment of Confluent Cloud on Azure DevOps, with Dynatrace o
 
 **Scope note:** Stage 3 provisions the infrastructure for data flow. No producer or consumer is deployed; the `orders` topic will appear empty in Confluent Cloud Console until an application team connects with `sa-orders-producer` credentials and starts writing. Demonstrating data flow (a sample producer/consumer) is out of scope for this stage.
 
-### ⏳ Stage 4 — Dynatrace integration (pending)
+### Stage 4 — Dynatrace integration
+
+- Dynatrace 15-day free trial tenant provisioned; Confluent Cloud (Kafka) extension installed from Dynatrace Hub
+- Confluent service account `sa-dynatrace-metrics` created with `MetricsViewer` role at organization scope
+- Cloud API key (`--resource cloud`) created for the Dynatrace service account; Cluster-scoped keys are not valid for the Metrics API
+- A dedicated Azure DevOps pipeline (`.azuredevops/pipelines/observability-pipeline.yml`) provisions a Linux VM to host a host-based **ActiveGate**
+- The VM is bootstrapped via a `CustomScript` extension that runs `install-activegate.sh` to download and install the ActiveGate using a PaaS token
+- ActiveGate is registered in Dynatrace and selected as the execution target for the Confluent Cloud extension
+- Monitoring configuration uses **Basic Authentication** (Cloud API key/secret) and the Confluent Metrics API `/export` endpoint with resource IDs for the Kafka cluster (`lkc-w7kwzp5`), Schema Registry (`lsrc-k8wogzg`), and ksqlDB (`lksqlc-dozpg31`)
+- Extension polls the Confluent Metrics API every 1 minute; **no agent** is installed inside Confluent Cloud or the application environment
+- Enabled feature sets: **Server Metrics**, **Server Consumer Lag Metrics**, **Schema Registry Metrics**, **KSQL Metrics**, and **Connector Metrics**
+- **Prebuilt dashboard** is available in the Dynatrace Dashboards app with tiles for broker throughput, cluster usage, and aggregate consumer lag
+
+**Consumer lag caveat:** The Dynatrace extension does not provide per-partition or per-consumer-group lag from the Confluent API. Detailed lag requires the Kafka Lag Exporter, which is out of scope for Stage 4. Aggregate lag from the Confluent API is available; per-group lag can be added in a future Stage 4.5.
+
+**Data flow note:** Broker throughput and consumer lag will read 0 until a producer and consumer connect to the `orders` topic. This is expected; the dashboard confirms the integration is working when baseline cluster metrics (connections, request counts, partition counts) are visible.
+
+Stage 4 verified: extension status is **Active**; Confluent metrics are visible in Dynatrace Data Explorer; the prebuilt dashboard renders without errors.
